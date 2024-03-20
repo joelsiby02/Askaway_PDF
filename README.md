@@ -49,13 +49,6 @@ Askaway PDF Chatbot is a Streamlit web application that allows users to ask ques
     if deployed:
     - Visit 'https://aistudio.google.com/app/apikey'
     - Create an API key and Paste it into the application
-    else:
-    - Visit 'https://aistudio.google.com/app/apikey'
-    - Create a .env file & initilize your api key and laod it in app.py file
-
-     ```plaintext
-     GOOGLE_API_KEY=your_api_key_here
-     ```
 
 3. Run the Streamlit app:
 
