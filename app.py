@@ -1,4 +1,3 @@
-# importing deps
 import streamlit as st
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -30,8 +29,8 @@ def get_pdf_text(pdf_doc):
         pdf_reader = PdfReader(pdf)
         for page in pdf_reader.pages:
             text += page.extract_text()
-        return text
-    
+    return text
+
 # After pdf input, transform into chunks
 def get_text_chunks(text):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size = 10000, chunk_overlap = 1000)
@@ -45,12 +44,20 @@ def get_vector_store(text_chunks):
     vector_store.save_local("faiss_index")
     
 def get_conversational_chain():
+    # prompt_template = """
+    # Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
+    # provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
+    # Context:\n {context}?\n
+    # Question: \n{question}\n
+
+    # Answer:
+    # """
+    
     prompt_template = """
-    Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
-    provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
+    Answer the question as thoroughly as possible based on the given context. Make sure to include all relevant details. If the answer is not directly available in the provided context, feel free to assist the user by providing additional information or suggestions.\n\n
     Context:\n {context}?\n
     Question: \n{question}\n
-
+    
     Answer:
     """
 
@@ -79,7 +86,17 @@ def user_input(user_question):
     print(response)
     st.write("Reply: ", response['output_text'])
     
+    # Store conversation history in session state
+    conversation_history = st.session_state.get("conversation_history", [])
+    conversation_history.append({"question": user_question, "reply": response['output_text']})
+    st.session_state["conversation_history"] = conversation_history
 
+    # Display conversation history
+    if conversation_history:
+        st.subheader("Conversation History:")
+        for item in conversation_history:
+            st.write("Question:", item["question"])
+            st.write("Reply:", item["reply"])
 
 def main():
     st.set_page_config("Askaway")
